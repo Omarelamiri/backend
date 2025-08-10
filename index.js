@@ -55,10 +55,12 @@ app.get('/', (req, res) => {
 const tenantRoutes = require('./routes/TenantRoutes');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
+const employeeRoutes = require('./routes/EmployeeRoutes');
 
 app.use('/api/tenants', tenantRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/employees', employeeRoutes);
 
 console.log('✅ All routes loaded successfully');
 
@@ -150,6 +152,65 @@ if (process.env.NODE_ENV === 'development') {
               password: 'string (required)',
               role: 'string (optional)'
             }
+          }
+        },
+        employees: {
+          'GET /api/employees': {
+            description: 'List employees with filtering and pagination',
+            headers: {
+              'x-tenant-id': 'string (required)',
+              'Authorization': 'Bearer <token> (required)'
+            },
+            query: {
+              page: 'integer (optional)',
+              limit: 'integer (optional, max 100)',
+              search: 'string (optional)',
+              department: 'string (optional)',
+              employmentStatus: 'string (optional)',
+              employmentType: 'string (optional)',
+              managerId: 'integer (optional)',
+              sortBy: 'string (optional)',
+              sortOrder: 'string (optional, ASC|DESC)',
+              includeInactive: 'boolean (optional)'
+            }
+          },
+          'POST /api/employees': {
+            description: 'Create new employee (Admin only)',
+            headers: {
+              'x-tenant-id': 'string (required)',
+              'Authorization': 'Bearer <token> (required)'
+            },
+            body: {
+              firstName: 'string (required)',
+              lastName: 'string (required)',
+              email: 'string (required)',
+              jobTitle: 'string (required)',
+              hireDate: 'string (required, YYYY-MM-DD)',
+              department: 'string (optional)',
+              employmentType: 'string (optional)',
+              salary: 'number (optional)',
+              // ... other optional fields
+            }
+          },
+          'GET /api/employees/:id': {
+            description: 'Get employee details',
+            access: 'Owner or Manager+'
+          },
+          'PUT /api/employees/:id': {
+            description: 'Update employee',
+            access: 'Owner (limited) or Admin (full)'
+          },
+          'DELETE /api/employees/:id': {
+            description: 'Delete employee (Admin only)'
+          },
+          'GET /api/employees/my-profile': {
+            description: 'Get own employee profile'
+          },
+          'PUT /api/employees/my-profile': {
+            description: 'Update own profile (limited fields)'
+          },
+          'GET /api/employees/stats': {
+            description: 'Get employee statistics (Manager+ only)'
           }
         }
       },
